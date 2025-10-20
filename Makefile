@@ -5,15 +5,16 @@ setup:
 	go install mvdan.cc/gofumpt@latest
 	go install github.com/sqs/goreturns@latest
 	go install -v github.com/go-critic/go-critic/cmd/gocritic@latest
-	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.63.4
-	pip install pre-commit
-	pre-commit install
+	go install golang.org/x/tools/cmd/goimports@latest
+	go install github.com/daixiang0/gci@latest
 
 fmt:
-	gofmt -w -s ./internal
-	goimports -w ./internal
-	gofumpt -w ./internal
+	gofmt -w -s ./cmd
+	gofumpt -w ./cmd
+	goimports -w ./cmd
+	gci write ./cmd
 	go mod tidy
+	golangci-lint run
 
 test:
 	go test ./... -race

@@ -1,8 +1,8 @@
-# TODO: should be renaimed
+# ldap314ki
 
-<!-- [![Go Report Card](https://goreportcard.com/badge/github.com/devalv/wb-inbox-mail-count)](https://goreportcard.com/report/github.com/devalv/wb-inbox-mail-count) -->
-<!-- [![CodeQL](https://github.com/devalv/wb-inbox-mail-count/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/devalv/wb-inbox-mail-count/actions/workflows/codeql-analysis.yml) -->
-<!-- [![codecov](https://codecov.io/gh/devalv/wb-inbox-mail-count/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/wb-inbox-mail-count) -->
+[![Go Report Card](https://goreportcard.com/badge/github.com/devalv/ldap314ki)](https://goreportcard.com/report/github.com/devalv/ldap314ki)
+[![CodeQL](https://github.com/devalv/ldap314ki/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/devalv/ldap314ki/actions/workflows/codeql-analysis.yml)
+[![codecov](https://codecov.io/gh/devalv/ldap314ki/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/ldap314ki)
 
 ## TODO: пример работы
 TODO: заполнить
@@ -37,7 +37,7 @@ make setup
 
 ## Структура проекта
 ```
-go-boiler/
+ldap314ki/
 ├── cmd/
 │   └── app/
 │       └── main.go

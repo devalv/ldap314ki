@@ -1,7 +1,6 @@
-// TODO: rename module
-module github.com/devalv/go-boiler
+module github.com/devalv/ldap314ki
 
-go 1.23.4
+go 1.25.0
 
 require github.com/rs/zerolog v1.30.0
 

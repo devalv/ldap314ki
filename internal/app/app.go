@@ -4,9 +4,8 @@ import (
 	"context"
 	"os"
 
+	"github.com/devalv/ldap314ki/internal/config"
 	"github.com/rs/zerolog/log"
-
-	"github.com/devalv/go-boiler/internal/config"
 )
 
 type Application struct {
@@ -15,6 +14,7 @@ type Application struct {
 
 func NewApplication(cfg *config.Config) *Application {
 	app := &Application{cfg: cfg}
+
 	return app
 }
 
