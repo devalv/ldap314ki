@@ -11,7 +11,13 @@ import (
 )
 
 type Config struct {
-	Debug      bool `yaml:"debug"`
+	Debug      bool   `yaml:"debug"`
+	URL        string `yaml:"url"`
+	BaseDN     string `yaml:"baseDn"`
+	Username   string `yaml:"username"`
+	Password   string `yaml:"password"`
+	LdapFilter string `yaml:"ldapFilter"`
+
 	ConfigPath string
 }
 

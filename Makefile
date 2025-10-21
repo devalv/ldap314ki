@@ -19,12 +19,12 @@ fmt:
 test:
 	go test ./... -race
 
-cover:
-	go test ./... -race -cover
+# cover:
+# 	go test ./... -race -cover
 
 build:
 	$(MAKE) fmt
 	go build -o application ./cmd/app
 
 run:
-	go run ./cmd/app
+	go run ./cmd/app --config ./config-local.yml

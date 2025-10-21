@@ -2,7 +2,6 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/devalv/ldap314ki)](https://goreportcard.com/report/github.com/devalv/ldap314ki)
 [![CodeQL](https://github.com/devalv/ldap314ki/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/devalv/ldap314ki/actions/workflows/codeql-analysis.yml)
-[![codecov](https://codecov.io/gh/devalv/ldap314ki/branch/main/graph/badge.svg)](https://codecov.io/gh/devalv/ldap314ki)
 
 ## TODO: пример работы
 TODO: заполнить
@@ -10,16 +9,15 @@ TODO: заполнить
 ## Установка и конфигурация
 TODO: заполнить
 
-### Установка собранного bin-файла
-TODO: заполнить
 
 ### Содержимое конфигурационного файла приложения (config.yml)
+TODO: дополнить
 ```
 debug: false
 ```
 
 ## Установка для разработки
-1. Убедитесь, что установлена подходящая версия [Go](https://go.dev/dl/) - **1.23**.
+1. Убедитесь, что установлена подходящая версия [Go](https://go.dev/dl/) - **1.25**.
 
 2. Запустите **make** команду для установки утилит разработки.
 
@@ -31,11 +29,11 @@ make setup
 - **setup**   - установка утилит для разработки/проверки
 - **fmt**     - запуск gofmt и goimports
 - **test**    - запуск тестов
-- **cover**   - вывод % покрытия тестов
 - **build**   - сборка исполняемого файла
 
 
 ## Структура проекта
+TODO: ещё раз подумать над структурой
 ```
 ldap314ki/
 ├── cmd/
@@ -56,14 +54,9 @@ ldap314ki/
 │   │   └── consts/
 |   |       └──consts.go
 |   ├── usecase/             // Бизнес логика
-│   │   └── waybar.go
+│   │   └── ldap.go
 ```
 
-<!-- ## Сборка deb-пакета -->
-<!-- TODO: актуализировать для v0.2 -->
-
 ## TODO v0.2
-- TODO: автоматизировать сборку deb-пакета в github
-- TODO: автоматизировать сборку bin-артефактов в github
 - TODO: тесты
-- TODO: сборка debian-пакета
+- TODO: избавиться от zerolog?

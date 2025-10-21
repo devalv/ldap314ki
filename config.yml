@@ -1,1 +1,5 @@
 debug: true
+url: "ldap://127.0.0.1:38938"
+baseDn: "dc=demo,dc=lab"
+username: "ldapuser"
+password: "ldapPASSW0RD"

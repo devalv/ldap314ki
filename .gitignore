@@ -33,3 +33,5 @@ config-local.yml
 
 # Build artifacts
 application
+
+config-local.yml
