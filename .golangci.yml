@@ -9,6 +9,8 @@ linters:
     - depguard
     - err113
     - noinlineerr
+    - nonamedreturns
+    - revive
 
 formatters:
   enable:

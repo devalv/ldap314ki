@@ -18,7 +18,7 @@ type Config struct {
 func validateConfigPath(path string) error {
 	s, err := os.Stat(path)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to validate config path: %w", err)
 	}
 
 	if s.IsDir() {
@@ -34,7 +34,7 @@ func parseFlags() (path string, err error) {
 	flag.Parse()
 
 	if err := validateConfigPath(cfgPath); err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to parse application flags: %w", err)
 	}
 
 	return cfgPath, nil
@@ -49,7 +49,7 @@ func NewConfig() (*Config, error) {
 	var cfg Config
 	err = cleanenv.ReadConfig(cfgPath, &cfg)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read config: %w", err)
 	}
 	cfg.ConfigPath = cfgPath
 	cfg.ConfigureLogger()
