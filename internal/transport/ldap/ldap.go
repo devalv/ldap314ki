@@ -34,7 +34,7 @@ func GetLDAPUsers(ctx context.Context, cfg *config.Config) ([]LDAPUser, error) {
 	}()
 
 	// Аутентификация
-	err = conn.Bind(cfg.Username, cfg.Password)
+	err = conn.Bind(cfg.LDAPUsername, cfg.LDAPassword)
 	if err != nil {
 		return nil, fmt.Errorf("ошибка аутентификации в ldap: %w", err)
 	}
@@ -43,7 +43,7 @@ func GetLDAPUsers(ctx context.Context, cfg *config.Config) ([]LDAPUser, error) {
 	searchRequest := ldap.NewSearchRequest(
 		cfg.BaseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
-		cfg.LdapFilter,
+		cfg.LDAPFilter,
 		[]string{"dn", "cn", "uid", "mail", "givenName", "sn", "displayName"},
 		nil,
 	)

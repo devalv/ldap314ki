@@ -1,5 +1,9 @@
 debug: true
 url: "ldap://127.0.0.1:38938"
 baseDn: "dc=demo,dc=lab"
-username: "ldapuser"
-password: "ldapPASSW0RD"
+ldapUsername: "ldapuser"
+ldapPassword: "ldapPASSW0RD"
+ldapFilter: "(objectClass=person)"
+caCertPath: "./ca_cert.pem"
+caKeyPath: "./ca_key.pem"
+caPassword: "CApassword"

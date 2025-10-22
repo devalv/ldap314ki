@@ -5,6 +5,7 @@ go 1.25
 require (
 	github.com/go-ldap/ldap/v3 v3.4.12
 	github.com/rs/zerolog v1.30.0
+	github.com/youmark/pkcs8 v0.0.0-20240726163527-a2c0da244d78
 )
 
 require (
