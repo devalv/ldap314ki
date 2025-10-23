@@ -7,3 +7,5 @@ ldapFilter: "(objectClass=person)"
 caCertPath: "./ca_cert.pem"
 caKeyPath: "./ca_key.pem"
 caPassword: "CApassword"
+certValidityDays: 30
+certKeySize: 2048

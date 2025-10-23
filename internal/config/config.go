@@ -11,15 +11,17 @@ import (
 )
 
 type Config struct {
-	Debug        bool   `yaml:"debug"`
-	URL          string `yaml:"url"`
-	BaseDN       string `yaml:"baseDn"`
-	LDAPUsername string `yaml:"ldapUsername"`
-	LDAPassword  string `yaml:"ldapPassword"`
-	LDAPFilter   string `yaml:"ldapFilter"`
-	CACertPath   string `yaml:"caCertPath"`
-	CAKeyPath    string `yaml:"caKeyPath"`
-	CAPassword   string `yaml:"caPassword"`
+	Debug            bool   `yaml:"debug"`
+	URL              string `yaml:"url"`
+	BaseDN           string `yaml:"baseDn"`
+	LDAPUsername     string `yaml:"ldapUsername"`
+	LDAPassword      string `yaml:"ldapPassword"`
+	LDAPFilter       string `yaml:"ldapFilter"`
+	CACertPath       string `yaml:"caCertPath"`
+	CAKeyPath        string `yaml:"caKeyPath"`
+	CAPassword       string `yaml:"caPassword"`
+	CertValidityDays int    `yaml:"certValidityDays"`
+	CertKeySize      int    `yaml:"certKeySize"`
 
 	ConfigPath string
 }

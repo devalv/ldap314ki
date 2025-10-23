@@ -6,6 +6,7 @@ import (
 
 	"github.com/devalv/ldap314ki/internal/certs"
 	"github.com/devalv/ldap314ki/internal/config"
+	transport "github.com/devalv/ldap314ki/internal/transport/ldap"
 	"github.com/rs/zerolog/log"
 )
 
@@ -22,17 +23,26 @@ func NewApplication(cfg *config.Config) *Application {
 func (app *Application) Start(ctx context.Context) {
 	log.Debug().Msg("Starting the application")
 
-	// lu, err := transport.GetLDAPUsers(ctx, app.cfg)
-	// if err != nil {
-	// 	log.Fatal().Err(err).Msg("ошибка получения пользователей из ldap")
-	// }
+	ldapUsers, err := transport.GetLDAPUsers(ctx, app.cfg)
+	if err != nil {
+		log.Fatal().Err(err).Msg("ошибка получения пользователей из ldap")
+	}
 
 	// Создание сертификатов для каждого полученного пользователя
-	// for _, u := range lu {
-	// 	log.Debug().Msgf("Found ldap User: %v", u)
-	// }
+	for _, user := range ldapUsers {
+		log.Debug().Msgf("Found ldap User: %v", user.CN)
+		certName, err := certs.GenerateUserCertificate(
+			app.cfg.CACertPath, app.cfg.CAKeyPath, app.cfg.CAPassword, app.cfg.CertKeySize, certs.UserCertInfo{
+				CommonName:   user.CN,
+				Emails:       []string{user.Mail},
+				ValidityDays: app.cfg.CertValidityDays,
+			})
+		if err != nil {
+			log.Fatal().Err(err).Msg("ошибка создания сертификата")
+		}
+		log.Info().Msgf("Сертификат для пользователя %s создан: %s", user.CN, certName)
+	}
 
-	certs.GenerateUserCertificate(app.cfg.CACertPath, app.cfg.CAKeyPath, app.cfg.CAPassword, "test")
 	app.Stop(ctx)
 }
 
