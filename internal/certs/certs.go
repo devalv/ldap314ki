@@ -183,33 +183,14 @@ func saveCertificateAndKey(certDER []byte, privateKey *rsa.PrivateKey, certPath,
 	return nil
 }
 
-// func QuickGenerateUserCert(caCertPath, caKeyPath, userCommonName string) error {
-// 	// Загрузка CA
-// 	caCert, caKey, err := LoadCACertificate(caCertPath, caKeyPath)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	// Генерация пользовательского сертификата
-// 	certDER, userKey, err := GenerateUserCertificate(caCert, caKey, userCommonName, 365)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	// Сохранение
-// 	certFile := userCommonName + ".crt"
-// 	keyFile := userCommonName + ".key"
-
-// 	return SaveCertificateAndKey(certDER, userKey, certFile, keyFile)
-// }
-
+// GenerateUserCertificate генерирует пользовательский сертификат.
 func GenerateUserCertificate(
 	caCertPath, caKeyPath, caPass string, keySize int, certInfo UserCertInfo,
-) (userCertName string, err error) {
+) (err error) {
 	// Загрузка промежуточного CA
 	caCert, caKey, err := loadCACertificate(caCertPath, caKeyPath, caPass)
 	if err != nil {
-		return "", fmt.Errorf("ошибка загрузки CA: %w", err)
+		return fmt.Errorf("ошибка загрузки CA: %w", err)
 	}
 
 	// Генерация пользовательского сертификата
@@ -222,31 +203,31 @@ func GenerateUserCertificate(
 		certInfo.ValidityDays,
 	)
 	if err != nil {
-		return "", fmt.Errorf("ошибка генерации пользовательского сертификата: %w", err)
+		return fmt.Errorf("ошибка генерации пользовательского сертификата: %w", err)
 	}
 
 	// Сохранение сертификата и ключа
 	// TODO: путь до ключей читать из конфига
 	err = saveCertificateAndKey(certDER, userKey, "user_certificate.crt", "user_private.key")
 	if err != nil {
-		return "", fmt.Errorf("ошибка сохранения пользовательского сертификата: %w", err)
+		return fmt.Errorf("ошибка сохранения пользовательского сертификата: %w", err)
 	}
 
 	log.Debug().Msgf("Сертификат для пользователя %s создан. Выполняем верификацию...", certInfo.CommonName)
 
 	// Верификация сертификата
-	// userCert, err := x509.ParseCertificate(certDER)
-	// if err != nil {
-	// 	fmt.Printf("Error parsing generated certificate: %v\n", err)
-	// 	return
-	// }
+	userCert, err := x509.ParseCertificate(certDER)
+	if err != nil {
+		return fmt.Errorf("ошибка верификации пользовательского сертификата: %w", err)
+	}
 
 	// Проверка подписи
-	// err = userCert.CheckSignatureFrom(caCert)
-	// if err != nil {
-	// 	fmt.Printf("Certificate signature verification failed: %v\n", err)
-	// } else {
-	// 	fmt.Println("Certificate signature verified successfully!")
-	// }
-	return "", nil
+	err = userCert.CheckSignatureFrom(caCert)
+	if err != nil {
+		return fmt.Errorf("ошибка проверки  пользовательского сертификата: %w", err)
+	}
+
+	log.Debug().Msgf("Сертификат для пользователя %s верифицирован.", certInfo.CommonName)
+
+	return nil
 }

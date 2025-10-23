@@ -31,7 +31,7 @@ func (app *Application) Start(ctx context.Context) {
 	// Создание сертификатов для каждого полученного пользователя
 	for _, user := range ldapUsers {
 		log.Debug().Msgf("Found ldap User: %v", user.CN)
-		certName, err := certs.GenerateUserCertificate(
+		err := certs.GenerateUserCertificate(
 			app.cfg.CACertPath, app.cfg.CAKeyPath, app.cfg.CAPassword, app.cfg.CertKeySize, certs.UserCertInfo{
 				CommonName:   user.CN,
 				Emails:       []string{user.Mail},
@@ -40,7 +40,7 @@ func (app *Application) Start(ctx context.Context) {
 		if err != nil {
 			log.Fatal().Err(err).Msg("ошибка создания сертификата")
 		}
-		log.Info().Msgf("Сертификат для пользователя %s создан: %s", user.CN, certName)
+		log.Info().Msgf("Сертификат для пользователя %s создан", user.CN)
 	}
 
 	app.Stop(ctx)
