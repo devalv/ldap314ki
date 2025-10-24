@@ -30,6 +30,10 @@ go.work
 *.env
 *netrc
 config-local.yml
+*.crt
+*.csr
+*.key
+./certs
 
 # Build artifacts
 application
