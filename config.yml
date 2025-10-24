@@ -9,3 +9,4 @@ caKeyPath: "./ca_key.pem"
 caPassword: "CApassword"
 certValidityDays: 30
 certKeySize: 2048
+userCertSaveToPath: "./"

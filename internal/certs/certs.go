@@ -19,9 +19,12 @@ import (
 
 // UserCertInfo - атрибуты пользовательского сертификата.
 type UserCertInfo struct {
-	CommonName   string
-	Emails       []string
-	ValidityDays int
+	CommonName     string
+	Emails         []string
+	ValidityDays   int
+	SAMAccountName string
+
+	UserCertSaveToPath string
 }
 
 // loadPrivateKey загружает приватный ключ.
@@ -61,30 +64,24 @@ func loadPrivateKey(keyFile, password string) (*rsa.PrivateKey, error) {
 }
 
 // loadCACertificate загружает CA сертификат и приватный ключ.
-func loadCACertificate(certPath, keyPath, keyPassword string) (*x509.Certificate, *rsa.PrivateKey, error) {
+func loadCACertificate(certPath string) (*x509.Certificate, error) {
 	// Загрузка CA сертификата
 	certData, err := os.ReadFile(filepath.Clean(certPath))
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to read cert file: %w", err)
+		return nil, fmt.Errorf("failed to read cert file: %w", err)
 	}
 
 	block, _ := pem.Decode(certData)
 	if block == nil {
-		return nil, nil, errors.New("failed to parse CA certificate PEM")
+		return nil, errors.New("failed to parse CA certificate PEM")
 	}
 
 	caCert, err := x509.ParseCertificate(block.Bytes)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to parse CA certificate: %w", err)
+		return nil, fmt.Errorf("failed to parse CA certificate: %w", err)
 	}
 
-	// Загрузка приватного ключа
-	caKey, err := loadPrivateKey(keyPath, keyPassword)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	return caCert, caKey, nil
+	return caCert, nil
 }
 
 // generateUserCertificateWithExtensions создает пользовательский сертификат с дополнительными расширениями.
@@ -103,11 +100,12 @@ func generateUserCertificateWithExtensions(
 	}
 
 	// Создание шаблона пользовательского сертификата
+	//nolint:exhaustruct
 	template := &x509.Certificate{
 		SerialNumber: big.NewInt(time.Now().UnixNano()),
 		Subject: pkix.Name{
 			Country:            caCert.Subject.Country,
-			OrganizationalUnit: caCert.Subject.OrganizationalUnit,
+			OrganizationalUnit: []string{caCert.Subject.CommonName},
 			Organization:       caCert.Subject.Organization,
 			Locality:           caCert.Subject.Locality,
 			Province:           caCert.Subject.Province,
@@ -117,11 +115,11 @@ func generateUserCertificateWithExtensions(
 		},
 		NotBefore: time.Now(),
 		NotAfter:  time.Now().AddDate(0, 0, validityDays),
-		KeyUsage:  x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
-		ExtKeyUsage: []x509.ExtKeyUsage{
-			x509.ExtKeyUsageClientAuth,
-			x509.ExtKeyUsageServerAuth,
-		},
+		KeyUsage:  x509.KeyUsageDigitalSignature | x509.KeyUsageDataEncipherment | x509.KeyUsageKeyEncipherment,
+		// ExtKeyUsage: []x509.ExtKeyUsage{
+		// 	x509.ExtKeyUsageClientAuth,
+		// 	x509.ExtKeyUsageServerAuth,
+		// },
 		BasicConstraintsValid: true,
 		IsCA:                  false,
 		DNSNames:              caCert.DNSNames,
@@ -140,8 +138,8 @@ func generateUserCertificateWithExtensions(
 func saveCertificateAndKey(certDER []byte, privateKey *rsa.PrivateKey, certPath, keyPath string) error {
 	// Права доступа для файлов
 	const (
-		certPerm = 0o644 // -rw-r--r--
-		keyPerm  = 0o600 // -rw-------
+		certPerm = 0o400 // -r--
+		keyPerm  = 0o400 // -r--
 	)
 	// Сохранение сертификата
 	certOut, err := os.OpenFile(filepath.Clean(certPath), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, certPerm)
@@ -154,6 +152,7 @@ func saveCertificateAndKey(certDER []byte, privateKey *rsa.PrivateKey, certPath,
 		}
 	}()
 
+	//nolint:exhaustruct
 	if err := pem.Encode(certOut, &pem.Block{
 		Type:  "CERTIFICATE",
 		Bytes: certDER,
@@ -173,6 +172,7 @@ func saveCertificateAndKey(certDER []byte, privateKey *rsa.PrivateKey, certPath,
 		}
 	}()
 
+	//nolint:exhaustruct
 	if err := pem.Encode(keyOut, &pem.Block{
 		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
@@ -188,9 +188,15 @@ func GenerateUserCertificate(
 	caCertPath, caKeyPath, caPass string, keySize int, certInfo UserCertInfo,
 ) (err error) {
 	// Загрузка промежуточного CA
-	caCert, caKey, err := loadCACertificate(caCertPath, caKeyPath, caPass)
+	caCert, err := loadCACertificate(caCertPath)
 	if err != nil {
 		return fmt.Errorf("ошибка загрузки CA: %w", err)
+	}
+
+	// Загрузка приватного ключа промежуточного CA
+	caKey, err := loadPrivateKey(caKeyPath, caPass)
+	if err != nil {
+		return fmt.Errorf("ошибка загрузки ключа CA: %w", err)
 	}
 
 	// Генерация пользовательского сертификата
@@ -207,8 +213,11 @@ func GenerateUserCertificate(
 	}
 
 	// Сохранение сертификата и ключа
-	// TODO: путь до ключей читать из конфига
-	err = saveCertificateAndKey(certDER, userKey, "user_certificate.crt", "user_private.key")
+	err = saveCertificateAndKey(
+		certDER, userKey,
+		certInfo.UserCertSaveToPath+certInfo.SAMAccountName+".crt",
+		certInfo.UserCertSaveToPath+certInfo.SAMAccountName+".key",
+	)
 	if err != nil {
 		return fmt.Errorf("ошибка сохранения пользовательского сертификата: %w", err)
 	}

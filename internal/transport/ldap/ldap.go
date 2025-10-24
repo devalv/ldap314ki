@@ -11,13 +11,14 @@ import (
 
 // LDAPUser - структура пользователя хранящаяся в домене.
 type LDAPUser struct {
-	DN          string
-	CN          string
-	UID         string
-	Mail        string
-	GivenName   string
-	Surname     string
-	DisplayName string
+	DN             string
+	CN             string
+	UID            string
+	Mail           string
+	GivenName      string
+	Surname        string
+	DisplayName    string
+	SAMAccountName string
 }
 
 // GetLDAPUsers выполняет подключение к серверу LDAP и поиск пользователей.
@@ -44,7 +45,7 @@ func GetLDAPUsers(ctx context.Context, cfg *config.Config) ([]LDAPUser, error) {
 		cfg.BaseDN,
 		ldap.ScopeWholeSubtree, ldap.NeverDerefAliases, 0, 0, false,
 		cfg.LDAPFilter,
-		[]string{"dn", "cn", "uid", "mail", "givenName", "sn", "displayName"},
+		[]string{"dn", "cn", "uid", "mail", "givenName", "sn", "displayName", "sAMAccountName"},
 		nil,
 	)
 
@@ -56,14 +57,16 @@ func GetLDAPUsers(ctx context.Context, cfg *config.Config) ([]LDAPUser, error) {
 	// Обработка результатов
 	users := make([]LDAPUser, 0)
 	for _, entry := range result.Entries {
+		log.Debug().Msgf("Found ldap User: %v", entry)
 		user := LDAPUser{
-			DN:          entry.DN,
-			CN:          entry.GetAttributeValue("cn"),
-			UID:         entry.GetAttributeValue("uid"),
-			Mail:        entry.GetAttributeValue("mail"),
-			GivenName:   entry.GetAttributeValue("givenName"),
-			Surname:     entry.GetAttributeValue("sn"),
-			DisplayName: entry.GetAttributeValue("displayName"),
+			DN:             entry.DN,
+			CN:             entry.GetAttributeValue("cn"),
+			UID:            entry.GetAttributeValue("uid"),
+			Mail:           entry.GetAttributeValue("mail"),
+			GivenName:      entry.GetAttributeValue("givenName"),
+			Surname:        entry.GetAttributeValue("sn"),
+			DisplayName:    entry.GetAttributeValue("displayName"),
+			SAMAccountName: entry.GetAttributeValue("sAMAccountName"),
 		}
 		users = append(users, user)
 	}

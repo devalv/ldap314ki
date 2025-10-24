@@ -33,9 +33,11 @@ func (app *Application) Start(ctx context.Context) {
 		log.Debug().Msgf("Found ldap User: %v", user.CN)
 		err := certs.GenerateUserCertificate(
 			app.cfg.CACertPath, app.cfg.CAKeyPath, app.cfg.CAPassword, app.cfg.CertKeySize, certs.UserCertInfo{
-				CommonName:   user.CN,
-				Emails:       []string{user.Mail},
-				ValidityDays: app.cfg.CertValidityDays,
+				CommonName:         user.CN,
+				Emails:             []string{user.Mail},
+				ValidityDays:       app.cfg.CertValidityDays,
+				SAMAccountName:     user.SAMAccountName,
+				UserCertSaveToPath: app.cfg.UserCertSaveToPath,
 			})
 		if err != nil {
 			log.Fatal().Err(err).Msg("ошибка создания сертификата")

@@ -59,4 +59,3 @@ ldap314ki/
 
 ## TODO v0.2
 - TODO: тесты
-- TODO: избавиться от zerolog?

@@ -11,17 +11,18 @@ import (
 )
 
 type Config struct {
-	Debug            bool   `yaml:"debug"`
-	URL              string `yaml:"url"`
-	BaseDN           string `yaml:"baseDn"`
-	LDAPUsername     string `yaml:"ldapUsername"`
-	LDAPassword      string `yaml:"ldapPassword"`
-	LDAPFilter       string `yaml:"ldapFilter"`
-	CACertPath       string `yaml:"caCertPath"`
-	CAKeyPath        string `yaml:"caKeyPath"`
-	CAPassword       string `yaml:"caPassword"`
-	CertValidityDays int    `yaml:"certValidityDays"`
-	CertKeySize      int    `yaml:"certKeySize"`
+	Debug              bool   `yaml:"debug"`
+	URL                string `yaml:"url"`
+	BaseDN             string `yaml:"baseDn"`
+	LDAPUsername       string `yaml:"ldapUsername"`
+	LDAPassword        string `yaml:"ldapPassword"`
+	LDAPFilter         string `yaml:"ldapFilter"`
+	CACertPath         string `yaml:"caCertPath"`
+	CAKeyPath          string `yaml:"caKeyPath"`
+	CAPassword         string `yaml:"caPassword"`
+	CertValidityDays   int    `yaml:"certValidityDays"`
+	CertKeySize        int    `yaml:"certKeySize"`
+	UserCertSaveToPath string `yaml:"userCertSaveToPath"`
 
 	ConfigPath string
 }
@@ -34,6 +35,30 @@ func validateConfigPath(path string) error {
 
 	if s.IsDir() {
 		return fmt.Errorf("'%s' is a directory, not a file", path)
+	}
+
+	return nil
+}
+
+// Проверяем наличие каталога указанного для сохранения пользовательских сертификатов.
+func validateCertsPath(path string) error {
+	// Права доступа на каталог
+	const (
+		cerDirPerm = 0o700 // -rwx--
+	)
+
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		log.Info().Msgf("Certs path '%s' does not exist, will be created", path)
+		err := os.MkdirAll(path, cerDirPerm)
+		if err != nil {
+			return fmt.Errorf("failed to create certs path: %w", err)
+		}
+
+		return nil
+	}
+	if !fileInfo.IsDir() {
+		return fmt.Errorf("'%s' is not a directory", path)
 	}
 
 	return nil
@@ -64,6 +89,10 @@ func NewConfig() (*Config, error) {
 	}
 	cfg.ConfigPath = cfgPath
 	cfg.ConfigureLogger()
+
+	if err := validateCertsPath(cfg.UserCertSaveToPath); err != nil {
+		log.Fatal().Err(err).Msg("failed to validate certs path")
+	}
 
 	return &cfg, nil
 }
